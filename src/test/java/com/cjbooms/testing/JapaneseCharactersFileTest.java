@@ -1,13 +1,12 @@
 package com.cjbooms.testing;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLEncoder;
+import java.net.URLDecoder;
 
 
 public class JapaneseCharactersFileTest {
@@ -15,76 +14,49 @@ public class JapaneseCharactersFileTest {
     private static final String PASSING_FILE = "images/passing/アンドリューは本当に凄いですawesomeだと思います.jpg";
     private static final String FAILING_CHARACTER_FILE = "images/failing/𩸽.jpg";
     private static final String FAILING_MIXED_CHARACTER_FILE = "images/failing/アンドリューは本当に凄いですawesomeだと思います𩸽.jpg";
+    private final ClassLoader CLASS_LOADER = getClass().getClassLoader();
 
-    private String encodedPassingFile;
-    private String encodedFailingCharacterFile;
-    private String encodedFailingMixedCharacterFile;
-
-    @Before
-    public void setup() throws UnsupportedEncodingException {
-        encodedPassingFile = URLEncoder.encode(PASSING_FILE, "UTF-16");
-        encodedFailingCharacterFile = URLEncoder.encode(FAILING_CHARACTER_FILE, "UTF-8");
-        encodedFailingMixedCharacterFile = URLEncoder.encode(FAILING_MIXED_CHARACTER_FILE, "UTF-8");
-
-    }
 
     @Test
     public void loadImageWithNoProblemCharacters() throws UnsupportedEncodingException {
-        ClassLoader classLoader = getClass().getClassLoader();
-
-        URL fileUrl = classLoader.getResource(new String(PASSING_FILE.getBytes(), "utf-8"));
-        File file = new File(fileUrl.getFile());
-
-        Assert.assertTrue(file.exists());
+        verifyFileExists(PASSING_FILE);
     }
 
-    @Test
-    public void loadImageWithNoProblemCharactersEncoded() {
-        ClassLoader classLoader = getClass().getClassLoader();
 
-        URL fileUrl = classLoader.getResource(encodedPassingFile);
-        File file = new File(fileUrl.getFile());
-
-        Assert.assertTrue(file.exists());
-    }
 
     @Test
     public void loadProblemCharacterImage() {
-        ClassLoader classLoader = getClass().getClassLoader();
-
-        URL fileUrl = classLoader.getResource(encodedFailingCharacterFile);
-        File file = new File(fileUrl.getFile());
-
-        Assert.assertTrue(file.exists());
+        verifyFileExists(FAILING_CHARACTER_FILE);
     }
 
-    @Test
-    public void loadProblemCharacterImageWithCharacterEncoded() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL fileUrl = classLoader.getResource("images/failing/\uD867\uDE3D.jpg");
-        File file = new File(fileUrl.getFile());
 
-        Assert.assertTrue(file.exists());
-    }
 
     @Test
     public void loadMultiCharacterImageWithProblemCharacter() {
-        ClassLoader classLoader = getClass().getClassLoader();
-
-        URL fileUrl = classLoader.getResource(encodedFailingMixedCharacterFile);
-        File file = new File(fileUrl.getFile());
-
-        Assert.assertTrue(file.exists());
+        verifyFileExists(FAILING_MIXED_CHARACTER_FILE);
     }
 
-    @Test
-    public void loadMultiCharacterImageWithProblemCharacterEncoded() {
-        ClassLoader classLoader = getClass().getClassLoader();
 
-        URL fileUrl = classLoader.getResource("images/failing/アンドリューは本当に凄いですawesomeだと思います\uD867\uDE3D.jpg");
-        File file = new File(fileUrl.getFile());
 
-        Assert.assertTrue(file.exists());
+
+    private void verifyFileExists(String relativeFilePath) {
+        try {
+            System.out.println("Relative File Path is:\n" + relativeFilePath);
+            URL fileUrl = CLASS_LOADER.getResource(relativeFilePath);
+            System.out.println("File URL is:\n" + fileUrl);
+            String decodedFilePath = URLDecoder.decode(fileUrl.getFile(), "UTF-8");
+            System.out.println("Decoded File URL is:\n" + decodedFilePath);
+
+            File file = new File(decodedFilePath);
+
+            Assert.assertTrue("File found but exists() failing", file.exists());
+
+        } catch (UnsupportedEncodingException e) {
+            Assert.fail("Encoding exception:\n" + e);
+        } catch (NullPointerException e) {
+            Assert.fail("File not found:\n" + e);
+        }
+
     }
 
 }
