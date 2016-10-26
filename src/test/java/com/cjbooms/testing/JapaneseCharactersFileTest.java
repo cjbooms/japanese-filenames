@@ -12,6 +12,8 @@ import java.net.URLDecoder;
 public class JapaneseCharactersFileTest {
 
     private static final String PASSING_FILE = "images/passing/アンドリューは本当に凄いですawesomeだと思います.jpg";
+    private static final String EMOJI = "images/failing/😀.jpg";
+    private static final String EMOJI_ESCAPED = "images/failing/\uD83D\uDE00.jpg";
     private static final String FAILING_CHARACTER_FILE = "images/failing/𩸽.jpg";
     private static final String FAILING_MIXED_CHARACTER_FILE = "images/failing/アンドリューは本当に凄いですawesomeだと思います𩸽.jpg";
     private final ClassLoader CLASS_LOADER = getClass().getClassLoader();
@@ -22,22 +24,25 @@ public class JapaneseCharactersFileTest {
         verifyFileExists(PASSING_FILE);
     }
 
-
-
     @Test
     public void loadProblemCharacterImage() {
         verifyFileExists(FAILING_CHARACTER_FILE);
     }
-
-
 
     @Test
     public void loadMultiCharacterImageWithProblemCharacter() {
         verifyFileExists(FAILING_MIXED_CHARACTER_FILE);
     }
 
+    @Test
+    public void loadFileWithEmojiFileName() {
+        verifyFileExists(EMOJI);
+    }
 
-
+    @Test
+    public void loadFileWithEscapedEmojiFileName() {
+        verifyFileExists(EMOJI_ESCAPED);
+    }
 
     private void verifyFileExists(String relativeFilePath) {
         try {
