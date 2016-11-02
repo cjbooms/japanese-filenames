@@ -2,15 +2,21 @@
 
 Comparing problem characters in Java 8 with both Gradle & Maven 
 
-It appears as though Filenames containing supplementary characters / surrogate pairs cannot be accessed with the Java File class.
-http://stackoverflow.com/questions/1545625/java-cant-open-a-file-with-surrogate-unicode-values-in-the-filename?noredirect=1&lq=1
 
-Further more there appear to be differences between Gradle and Maven. 
+Results for Gradle and Maven. 
 * Maven works fine
 * Gradle cannot copy files with supplementary characters to the build folder.
 
+Furthermore it appears as though file names containing supplementary 
+characters / surrogate pairs cannot be accessed with the Java File class 
+on Mac OSX. The default locale on the OS must be set to a locale that 
+includes those characters.
+* http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4733494
+* http://stackoverflow.com/a/1545670/1026785
+
 # Build Instructions
 This project contains both maven and gradle build files to allow testing with both.
+The File.exists check is skipped on MAC-OSX.
 
 ## Maven
 `mvn clean install`
